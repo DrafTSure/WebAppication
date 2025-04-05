@@ -6,43 +6,72 @@
 }
 
 body {
-  font-family: Arial, sans-serif;
-  background-color: #f4f4f9;
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, #ff7e5f, #feb47b); /* Gradient background */
   color: #333;
   line-height: 1.6;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
 }
 
 .container {
   width: 90%;
-  max-width: 1200px;
-  margin: 20px auto;
-  padding: 20px;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-width: 900px;
+  background-color: #ffffff;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 1s ease-out;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 30px;
 }
 
 header h1 {
-  text-align: center;
-  color: #4CAF50;
-  font-size: 2rem;
-  margin-bottom: 20px;
+  font-size: 2.8rem;
+  color: #ff6347; /* Tomato color for the title */
+  font-weight: 600;
+}
+
+header p {
+  font-size: 1.2rem;
+  color: #777;
 }
 
 .config-details {
-  padding: 20px;
-  background-color: #f9f9f9;
-  border-radius: 8px;
-  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.05);
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 15px;
 }
 
-.config-details p {
-  font-size: 1.2rem;
-  margin-bottom: 10px;
+.config-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.1rem;
+  background-color: #ffffff;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.config-details span {
-  font-weight: bold;
+.config-item:hover {
+  transform: scale(1.03);  /* เพิ่มการขยายขนาดเมื่อ hover */
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
+}
+
+.config-item strong {
+  color: #ff6347;
+}
+
+.config-item span {
+  font-weight: 500;
   color: #00796b;
 }
 
@@ -52,10 +81,26 @@ header h1 {
   }
 
   header h1 {
-    font-size: 1.5rem;
+    font-size: 2rem;
   }
 
-  .config-details p {
+  .config-details {
+    grid-template-columns: 1fr;
+  }
+
+  .config-item {
     font-size: 1rem;
+  }
+}
+
+/* Animation for fade-in effect */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
