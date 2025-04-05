@@ -1,0 +1,155 @@
+const express = require('express');
+const axios = require('axios');
+const app = express();
+const port = 3000;
+
+// URL ของ Drone Config Server
+const droneConfigUrl = 'https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLhbYwXOOUeKJnEz4SGmtsegDyTniQ6ghQPMrf2Nbijfsv7g6VzKaU9ljkUmS6jpePXdMdkofBj2oah0M_kKAs_QzJe5Oh1sP57zQ4Z0Ha-8HI8pw1buB_F0lbeLFLotTTL2uF0ut2ckYN3B5JCxftv8Dbefn56-KzdGLZWevzUnVbD4aVraZbHe8jOTRhcms5D5IbnrXNLn5V7efUYQeckwP6yqSO4VHywLKVXNa5Ibta4CBisbceUoDGnzIvZm6gxR0YJUNk8IOaLozTulWN8p9ELrhe9Apep9V5iP&lib=M9_yccKOaZVEQaYjEvK1gClQlFAuFWsxN';
+
+const droneLogUrl = 'https://app-tracking.pockethost.io/api/collections/drone_logs/records';
+
+// เส้นทาง root ของ API
+app.get('/', (req, res) => {
+    res.send('Welcome to the Drone API Server!');
+});
+
+app.get('/configs', async (req, res) => {
+  try {
+    const response = await axios.get(droneConfigUrl);
+    console.log("Response Data:", response.data);
+    res.json(response.data);
+  } catch (error) {
+    console.error('Error fetching data:', error.message);
+    res.status(500).json({ error: 'Failed to fetch data' });
+  }
+}); 
+
+// API Endpoint สำหรับดึงข้อมูล Drone Config
+app.get('/configs/:droneId', async (req, res) => {
+    try {
+        // รับค่า droneId จากพารามิเตอร์ใน URL
+        const droneId = req.params.droneId;
+
+        // ส่งคำขอไปยัง Drone Config Server พร้อมกับพารามิเตอร์ drone_id
+        const response = await axios.get(`${droneConfigUrl}&drone_id=${droneId}`);  // ส่ง drone_id เป็น query parameter
+
+        // ตรวจสอบข้อมูลที่ได้รับจาก API
+        console.log("Response Data:", response.data);
+
+        // กรองข้อมูลจาก response.data.data ที่มี drone_id ตรงกับ droneId
+        const droneData = response.data.data.filter(drone => drone.drone_id === parseInt(droneId));
+
+        // ถ้าพบข้อมูล
+        if (droneData.length > 0) {
+            // สร้าง object ที่มีข้อมูลเฉพาะที่ต้องการ
+            const filteredData = {
+                drone_id: droneData[0].drone_id,
+                drone_name: droneData[0].drone_name,
+                light: droneData[0].light,
+                country: droneData[0].country,
+                weight: droneData[0].weight
+            };
+
+            //แสดงแค่ที่ใช้
+            console.log("configs:", filteredData);
+            // ส่งข้อมูลที่กรองแล้วกลับไป
+            res.json(filteredData);
+        } else {
+            // ถ้าไม่พบข้อมูลที่ตรงกับ droneId
+            res.status(404).send('No config data found for the specified drone ID.');
+        }
+    } catch (error) {
+        console.error('Error details:', error.response ? error.response.data : error.message);
+        
+        // ส่งข้อความผิดพลาดและสถานะ
+        res.status(error.response ? error.response.status : 500).send('Error: ' + (error.response ? error.response.statusText : error.message));
+    }
+});
+
+app.get('/status/:droneId', async (req, res) => {
+    try {
+        // รับค่า droneId จากพารามิเตอร์ใน URL
+        const droneId = req.params.droneId;
+
+        // ส่งคำขอไปยัง Drone Config Server พร้อมกับพารามิเตอร์ drone_id
+        const response = await axios.get(`${droneConfigUrl}&drone_id=${droneId}`);  // ส่ง drone_id เป็น query parameter
+
+        console.log("Response Data:", response.data);
+        
+        const droneData = response.data.data.filter(drone => drone.drone_id === parseInt(droneId));
+
+        if (droneData.length > 0) {
+            
+            const filteredData = {
+                condition: droneData[0].condition,
+            };
+
+            console.log("status:", filteredData);
+            res.json(filteredData);
+        } else {
+            // ถ้าไม่พบข้อมูลที่ตรงกับ droneId
+            res.status(404).send('No config data found for the specified drone ID.');
+        }
+    } catch (error) {
+        console.error('Error details:', error.response ? error.response.data : error.message);
+        
+        // ส่งข้อความผิดพลาดและสถานะ
+        res.status(error.response ? error.response.status : 500).send('Error: ' + (error.response ? error.response.statusText : error.message));
+    }
+});
+
+
+
+// API Endpoint สำหรับดึงข้อมูล Drone Logs ตาม droneId
+app.get('/logs/:droneId', async (req, res) => {
+    try {
+        // รับค่า droneId จากพารามิเตอร์ใน URL
+        const droneId = req.params.droneId;
+
+        // ส่งคำขอไปยัง Drone Log Server พร้อมกับพารามิเตอร์ drone_id
+        const response = await axios.get(`${droneLogUrl}?drone_id=${droneId}`);  // ส่ง drone_id เป็น query parameter
+
+        // ตรวจสอบข้อมูลที่ได้รับจาก API
+        console.log("Response Data:", response.data);
+
+        // กรองข้อมูลจาก response.items ที่มี drone_id ตรงกับ droneId
+        const droneLogs = response.data.items.filter(log => log.drone_id === parseInt(droneId));
+
+        // ถ้าพบข้อมูล
+        if (droneLogs.length > 0) {
+            // เรียงข้อมูลจาก created ล่าสุด (จากใหม่ไปเก่า)
+            const sortedLogs = droneLogs.sort((a, b) => new Date(b.created) - new Date(a.created));
+
+            // จำกัดจำนวนรายการที่ส่งกลับเป็น 25 รายการ
+            const limitedLogs = sortedLogs.slice(0, 25);
+
+            // สร้าง object ที่มีข้อมูลเฉพาะที่ต้องการ (drone_id, drone_name, created, country, celsius)
+            const filteredLogs = limitedLogs.map(log => ({
+                drone_id: log.drone_id,
+                drone_name: log.drone_name,
+                created: log.created,
+                country: log.country,
+                celsius: log.celsius
+            }));
+
+            // แสดงแค่ที่ใช้
+            console.log("Filtered Logs:", filteredLogs);
+
+            // ส่งข้อมูลที่กรองแล้วกลับไป
+            res.json(filteredLogs);
+        } else {
+            res.status(404).send('No logs found for the specified drone ID.');
+        }
+    } catch (error) {
+        console.error('Error details from Log Server:', error.response ? error.response.data : error.message);
+        res.status(error.response ? error.response.status : 500).send('Error: ' + (error.response ? error.response.statusText : error.message));
+    }
+});
+
+
+
+
+// เริ่มต้นเซิร์ฟเวอร์
+app.listen(port, () => {
+    console.log(`API Server is running on http://localhost:${port}`);
+});
