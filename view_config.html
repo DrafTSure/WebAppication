@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drone Config</title>
+    <link rel="stylesheet" href="view_config.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Drone Config</h1>
+        </header>
+        <section class="config-details">
+            <p><strong>Drone ID:</strong> <span id="droneId">Loading...</span></p>
+            <p><strong>Drone Name:</strong> <span id="droneName">Loading...</span></p>
+            <p><strong>Light:</strong> <span id="light">Loading...</span></p>
+            <p><strong>Country:</strong> <span id="country">Loading...</span></p>
+        </section>
+    </div>
+
+    <script>
+        async function fetchConfigData() {
+                try {
+                    const idResponse = await axios.get('http://localhost:3000/get-drone-id');
+                    const droneId = idResponse.data.droneId;
+
+                    console.log('Fetched droneId:', droneId); // ตรวจสอบว่า droneId ที่ดึงมาถูกต้องหรือไม่
+
+                    const response = await axios.get(`http://localhost:3000/configs/${droneId}`);
+                    document.getElementById('droneId').textContent = response.data.drone_id || 'No data';
+                    document.getElementById('droneName').textContent = response.data.drone_name || 'No data';
+                    document.getElementById('light').textContent = response.data.light || 'No data';
+                    document.getElementById('country').textContent = response.data.country || 'No data';
+                } catch (error) {
+                    console.error('Error fetching data:', error);
+                    document.getElementById('droneId').textContent = 'Error';
+                    document.getElementById('droneName').textContent = 'Error';
+                    document.getElementById('light').textContent = 'Error';
+                    document.getElementById('country').textContent = 'Error';
+                }
+            }
+
+            fetchConfigData();
+
+    </script>
+</body>
+
+</html>

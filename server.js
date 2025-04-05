@@ -2,16 +2,29 @@ const express = require('express');
 const axios = require('axios');
 const app = express();
 const port = 3000;
+require('dotenv').config();
 
 // URL ของ Drone Config Server
-const droneConfigUrl = 'https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLhbYwXOOUeKJnEz4SGmtsegDyTniQ6ghQPMrf2Nbijfsv7g6VzKaU9ljkUmS6jpePXdMdkofBj2oah0M_kKAs_QzJe5Oh1sP57zQ4Z0Ha-8HI8pw1buB_F0lbeLFLotTTL2uF0ut2ckYN3B5JCxftv8Dbefn56-KzdGLZWevzUnVbD4aVraZbHe8jOTRhcms5D5IbnrXNLn5V7efUYQeckwP6yqSO4VHywLKVXNa5Ibta4CBisbceUoDGnzIvZm6gxR0YJUNk8IOaLozTulWN8p9ELrhe9Apep9V5iP&lib=M9_yccKOaZVEQaYjEvK1gClQlFAuFWsxN';
+const droneConfigUrl = process.env.DRONE_CONFIG_URL;
+const droneId = process.env.DRONE_ID;
+
+// const droneConfigUrl = 'https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLhbYwXOOUeKJnEz4SGmtsegDyTniQ6ghQPMrf2Nbijfsv7g6VzKaU9ljkUmS6jpePXdMdkofBj2oah0M_kKAs_QzJe5Oh1sP57zQ4Z0Ha-8HI8pw1buB_F0lbeLFLotTTL2uF0ut2ckYN3B5JCxftv8Dbefn56-KzdGLZWevzUnVbD4aVraZbHe8jOTRhcms5D5IbnrXNLn5V7efUYQeckwP6yqSO4VHywLKVXNa5Ibta4CBisbceUoDGnzIvZm6gxR0YJUNk8IOaLozTulWN8p9ELrhe9Apep9V5iP&lib=M9_yccKOaZVEQaYjEvK1gClQlFAuFWsxN';
 
 const droneLogUrl = 'https://app-tracking.pockethost.io/api/collections/drone_logs/records';
 const token = "20250301efx"
 
+// ใช้ CORS เพื่ออนุญาตให้ Frontend ติดต่อกับ Backend ได้
+const cors = require('cors');
+app.use(cors()); 
+
 // เส้นทาง root ของ API
 app.get('/', (req, res) => {
     res.send('Welcome to the Drone API Server!');
+});
+
+// API สำหรับส่งค่า droneId ไปยัง Frontend
+app.get('/get-drone-id', (req, res) => {
+  res.json({ droneId });
 });
 
 app.get('/configs', async (req, res) => {
@@ -154,7 +167,7 @@ app.get("/logs", async (req, res) => {
   }
 });
 
-//  แบบใช้ path parameter: /logs/3001
+// API Endpoint สำหรับดึงข้อมูล Drone logs
 app.get("/logs/:droneId", async (req, res) => {
   const { droneId } = req.params;
 
@@ -174,6 +187,7 @@ app.get("/logs/:droneId", async (req, res) => {
     res.status(500).json({ message: "Error fetching drone logs", error: error.message });
   }
 });
+
 
 // เริ่มต้นเซิร์ฟเวอร์
 app.listen(port, () => {
