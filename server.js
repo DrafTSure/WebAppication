@@ -7,6 +7,7 @@ const port = 3000;
 const droneConfigUrl = 'https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLhbYwXOOUeKJnEz4SGmtsegDyTniQ6ghQPMrf2Nbijfsv7g6VzKaU9ljkUmS6jpePXdMdkofBj2oah0M_kKAs_QzJe5Oh1sP57zQ4Z0Ha-8HI8pw1buB_F0lbeLFLotTTL2uF0ut2ckYN3B5JCxftv8Dbefn56-KzdGLZWevzUnVbD4aVraZbHe8jOTRhcms5D5IbnrXNLn5V7efUYQeckwP6yqSO4VHywLKVXNa5Ibta4CBisbceUoDGnzIvZm6gxR0YJUNk8IOaLozTulWN8p9ELrhe9Apep9V5iP&lib=M9_yccKOaZVEQaYjEvK1gClQlFAuFWsxN';
 
 const droneLogUrl = 'https://app-tracking.pockethost.io/api/collections/drone_logs/records';
+const token = "20250301efx"
 
 // เส้นทาง root ของ API
 app.get('/', (req, res) => {
@@ -98,56 +99,81 @@ app.get('/status/:droneId', async (req, res) => {
     }
 });
 
+// ฟังก์ชันดึง log ของ drone ตาม drone_id
+async function fetchDroneLogsById(droneId) {
+  const url = `${droneLogUrl}?filter=drone_id="${droneId}"&sort=-created&perPage=200`;
 
+  try {
+    const response = await axios.get(url, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
 
-// API Endpoint สำหรับดึงข้อมูล Drone Logs ตาม droneId
-app.get('/logs/:droneId', async (req, res) => {
-    try {
-        // รับค่า droneId จากพารามิเตอร์ใน URL
-        const droneId = req.params.droneId;
+    const data = response.data;
 
-        // ส่งคำขอไปยัง Drone Log Server พร้อมกับพารามิเตอร์ drone_id
-        const response = await axios.get(`${droneLogUrl}?drone_id=${droneId}`);  // ส่ง drone_id เป็น query parameter
-
-        // ตรวจสอบข้อมูลที่ได้รับจาก API
-        console.log("Response Data:", response.data);
-
-        // กรองข้อมูลจาก response.items ที่มี drone_id ตรงกับ droneId
-        const droneLogs = response.data.items.filter(log => log.drone_id === parseInt(droneId));
-
-        // ถ้าพบข้อมูล
-        if (droneLogs.length > 0) {
-            // เรียงข้อมูลจาก created ล่าสุด (จากใหม่ไปเก่า)
-            const sortedLogs = droneLogs.sort((a, b) => new Date(b.created) - new Date(a.created));
-
-            // จำกัดจำนวนรายการที่ส่งกลับเป็น 25 รายการ
-            const limitedLogs = sortedLogs.slice(0, 25);
-
-            // สร้าง object ที่มีข้อมูลเฉพาะที่ต้องการ (drone_id, drone_name, created, country, celsius)
-            const filteredLogs = limitedLogs.map(log => ({
-                drone_id: log.drone_id,
-                drone_name: log.drone_name,
-                created: log.created,
-                country: log.country,
-                celsius: log.celsius
-            }));
-
-            // แสดงแค่ที่ใช้
-            console.log("Filtered Logs:", filteredLogs);
-
-            // ส่งข้อมูลที่กรองแล้วกลับไป
-            res.json(filteredLogs);
-        } else {
-            res.status(404).send('No logs found for the specified drone ID.');
-        }
-    } catch (error) {
-        console.error('Error details from Log Server:', error.response ? error.response.data : error.message);
-        res.status(error.response ? error.response.status : 500).send('Error: ' + (error.response ? error.response.statusText : error.message));
+    if (!data.items || !Array.isArray(data.items)) {
+      throw new Error("Invalid data format: 'items' not found or not an array");
     }
+
+    // Map เอาเฉพาะ field ที่ต้องการ
+    const filteredLogs = data.items.map((log) => ({
+      drone_id: log.drone_id,
+      drone_name: log.drone_name,
+      created: log.created,
+      country: log.country,
+      celsius: log.celsius,
+    }));
+
+    return filteredLogs;
+  } catch (error) {
+    console.error("Error fetching drone logs:", error.message);
+    throw new Error("Failed to fetch drone logs");
+  }
+}
+
+//  แบบที่ใช้ query parameter: /logs?droneId=xxx
+app.get("/logs", async (req, res) => {
+  const droneId = req.query.droneId;
+
+  if (!droneId) {
+    return res.status(400).json({ message: "Drone ID is required" });
+  }
+
+  try {
+    const logs = await fetchDroneLogsById(droneId);
+
+    if (logs.length === 0) {
+      return res.status(404).json({ message: "No logs found for the specified drone." });
+    }
+
+    res.json(logs);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching drone logs", error: error.message });
+  }
 });
 
+//  แบบใช้ path parameter: /logs/3001
+app.get("/logs/:droneId", async (req, res) => {
+  const { droneId } = req.params;
 
+  if (!droneId) {
+    return res.status(400).json({ message: "Drone ID is required" });
+  }
 
+  try {
+    const logs = await fetchDroneLogsById(droneId);
+
+    if (logs.length === 0) {
+      return res.status(404).json({ message: "No logs found for the specified drone." });
+    }
+
+    res.json(logs);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching drone logs", error: error.message });
+  }
+});
 
 // เริ่มต้นเซิร์ฟเวอร์
 app.listen(port, () => {
