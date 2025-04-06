@@ -17,6 +17,8 @@ const token = "20250301efx"
 const cors = require('cors');
 app.use(cors()); 
 
+app.use(express.json());
+
 // เส้นทาง root ของ API
 app.get('/', (req, res) => {
     res.send('Welcome to the Drone API Server!');
@@ -114,7 +116,7 @@ app.get('/status/:droneId', async (req, res) => {
 
 // ฟังก์ชันดึง log ของ drone ตาม drone_id
 async function fetchDroneLogsById(droneId) {
-  const url = `${droneLogUrl}?filter=drone_id="${droneId}"&sort=-created&perPage=200`;
+  const url = `${droneLogUrl}?filter=drone_id="${droneId}"&sort=-created&perPage=25`;
 
   try {
     const response = await axios.get(url, {
@@ -185,6 +187,38 @@ app.get("/logs/:droneId", async (req, res) => {
     res.json(logs);
   } catch (error) {
     res.status(500).json({ message: "Error fetching drone logs", error: error.message });
+  }
+});
+
+// POST /logs เพื่อส่งข้อมูลไปยัง Drone Log Server
+app.post("/logs", async (req, res) => {
+  const { drone_id, drone_name, country, celsius } = req.body;
+
+  if (!drone_id || !drone_name || !country || celsius === undefined) {
+    return res.status(400).json({ message: "Missing required fields" });
+  }
+
+  try {
+    const response = await axios.post(
+      droneLogUrl,
+      {
+        drone_id,
+        drone_name,
+        country,
+        celsius,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    res.status(201).json({ message: "Log created successfully", data: response.data });
+  } catch (error) {
+    console.error("Error creating log:", error.message);
+    res.status(500).json({ message: "Failed to create log", error: error.message });
   }
 });
 
