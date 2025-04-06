@@ -13,14 +13,12 @@
     <div class="container">
         <header>
             <h1>Drone Config</h1>
-            <p>รายละเอียดของแต่ละ DroneID</p>
         </header>
         <section class="config-details">
             <p><strong>Drone ID:</strong> <span id="droneId">Loading...</span></p>
             <p><strong>Drone Name:</strong> <span id="droneName">Loading...</span></p>
             <p><strong>Light:</strong> <span id="light">Loading...</span></p>
             <p><strong>Country:</strong> <span id="country">Loading...</span></p>
-            <p><strong>weight:</strong> <span id="weight">Loading...</span></p>
         </section>
     </div>
 
@@ -41,7 +39,6 @@
                 document.getElementById('droneName').textContent = response.data.drone_name || 'No data';
                 document.getElementById('light').textContent = response.data.light || 'No data';
                 document.getElementById('country').textContent = response.data.country || 'No data';
-                document.getElementById('weight').textContent = response.data.weight || 'No data';
             } catch (error) {
                 console.error('Error fetching data:', error);
                 document.getElementById('droneId').textContent = 'Error';
