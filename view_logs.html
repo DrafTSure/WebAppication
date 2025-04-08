@@ -7,9 +7,27 @@
     <title>View Logs</title>
     <link rel="stylesheet" href="view_logs.css"> <!-- เชื่อมโยงไฟล์ CSS -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons"></script>
 </head>
 
 <body>
+
+    
+    <span class="hamburger" onclick="toggleSidebar()">&#9776;</span>
+
+    
+    <div id="mySidebar" class="sidebar">
+        <a href="javascript:void(0)" class="closebtn" onclick="toggleSidebar()">&#120143;</a>
+        <a href="view_config.html">
+            <i data-feather="eye" style="font-size: 20px; margin-right: 10px;"></i>
+            View Config
+        </a>
+        <a href="temperature_log_form.html">
+            <i data-feather="thermometer" style="font-size: 20px; margin-right: 10px;"></i>
+            Temperature
+        </a>
+    </div>
 
     <div class="container">
         <header>
@@ -36,7 +54,9 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            // ฟังก์ชันดึงข้อมูล logs จาก API
+            feather.replace(); // ฟังก์ชันนี้ทำให้ไอคอน Feather ปรากฏขึ้น
+
+            
             function fetchDroneLogs(droneId) {
                 fetch(`http://localhost:3000/logs/${droneId}`)
                     .then(response => response.json())
@@ -87,6 +107,20 @@
                     console.error("Error fetching drone ID:", error.message);
                 });
         });
+
+       
+        function toggleSidebar() {
+            let sidebar = document.getElementById("mySidebar");
+            let body = document.body;
+
+            if (sidebar.style.display === "block") {
+                sidebar.style.display = "none";  
+                body.classList.remove('sidebar-open');
+            } else {
+                sidebar.style.display = "block";  
+                body.classList.add('sidebar-open');
+            }
+        }
     </script>
 
 </body>

@@ -125,7 +125,7 @@ async function fetchDroneLogsById(droneId) {
         "Content-Type": "application/json",
       },
     });
-
+        
     const data = response.data;
 
     if (!data.items || !Array.isArray(data.items)) {

@@ -1,4 +1,5 @@
-Global Styles * {
+/* Global Styles */
+* {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -97,6 +98,74 @@ header p {
 .next-btn:focus {
   outline: none;
 }
+
+/* สไตล์ของ Sidebar */
+.sidebar {
+    height: 100%;
+    width: 250px; /* กำหนดขนาดของ sidebar */
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: rgba(51, 51, 51, 0.8); /* สีเข้มพร้อมความโปร่งใส */
+    overflow-x: hidden;
+    padding-top: 60px;
+    z-index: 1000;
+    border-radius: 8px; /* เพิ่มความกลมมน */
+    display: none; /* ซ่อน sidebar ตอนเริ่มต้น */
+}
+
+/* ปรับสไตล์ของแต่ละลิงก์ใน sidebar */
+.sidebar a {
+    padding: 8px 8px 8px 32px;
+    text-decoration: none;
+    font-size: 20px;
+    color: #fff;
+    display: block;
+    transition: 0.3s;
+    border-bottom: 1px solid #555; /* เพิ่มเส้นขอบให้ลิงก์ */
+}
+
+/* สีเมื่อ hover บนลิงก์ */
+.sidebar a:hover {
+    color: #f1f1f1;
+    background-color: #444;
+}
+
+/* ปุ่มปิด */
+.sidebar .closebtn {
+    position: absolute;
+    top: 0;
+    right: 25px;
+    font-size: 36px;
+    color: white;
+    text-decoration: none;
+    cursor: pointer;
+    padding: 5px 10px; /* ลดขนาด padding ของปุ่ม */
+    transition: none;
+}
+
+
+/* ลบเอฟเฟกต์ hover */
+.sidebar .closebtn:hover {
+    background-color: transparent; /* ลบการเปลี่ยนสีตอน hover */
+}
+
+/* ปุ่มแฮมเบอร์เกอร์ */
+.hamburger {
+    font-size: 30px;
+    cursor: pointer;
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    z-index: 1001;
+    color: #333;
+}
+
+/* ซ่อนปุ่มแฮมเบอร์เกอร์เมื่อ sidebar เปิด */
+.sidebar-open .hamburger {
+    display: none;
+}
+
 
 /* Responsive Design */
 @media (max-width: 768px) {
