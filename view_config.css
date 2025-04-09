@@ -75,30 +75,6 @@ header p {
   color: #555;
 }
 
-/* Next Button */
-.next-btn {
-  background-color: #3498db;
-  color: white;
-  border: none;
-  padding: 15px 30px;
-  font-size: 18px;
-  cursor: pointer;
-  border-radius: 8px;
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
-  transition: all 0.3s ease;
-}
-
-.next-btn:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-}
-
-.next-btn:focus {
-  outline: none;
-}
-
 /* สไตล์ของ Sidebar */
 .sidebar {
     height: 100%;
@@ -106,7 +82,7 @@ header p {
     position: fixed;
     top: 0;
     left: 0;
-    background-color: rgba(51, 51, 51, 0.8); /* สีเข้มพร้อมความโปร่งใส */
+    background-color: #3498db; /* เปลี่ยนเป็นสีฟ้าตามที่ต้องการ */
     overflow-x: hidden;
     padding-top: 60px;
     z-index: 1000;
@@ -122,13 +98,16 @@ header p {
     color: #fff;
     display: block;
     transition: 0.3s;
-    border-bottom: 1px solid #555; /* เพิ่มเส้นขอบให้ลิงก์ */
+    border-bottom: none; /* ลบเส้นขอบลิงก์ */
 }
 
 /* สีเมื่อ hover บนลิงก์ */
-.sidebar a:hover {
+.sidebar a:hover,
+.sidebar a:focus {
     color: #f1f1f1;
-    background-color: #444;
+    background-color: #81c5ea; /* สีฟ้าจางๆ เมื่อ hover หรือ focus */
+    font-size: 22px; /* ขนาดตัวอักษรใหญ่ขึ้นเมื่อ hover หรือ focus */
+    border-radius: 8px; /* ขอบมนเมื่อ hover หรือ focus */
 }
 
 /* ปุ่มปิด */
@@ -136,7 +115,7 @@ header p {
     position: absolute;
     top: 0;
     right: 25px;
-    font-size: 36px;
+    font-size: 36px; /* ขนาดปกติของปุ่ม */
     color: white;
     text-decoration: none;
     cursor: pointer;
@@ -144,10 +123,16 @@ header p {
     transition: none;
 }
 
-
 /* ลบเอฟเฟกต์ hover */
 .sidebar .closebtn:hover {
     background-color: transparent; /* ลบการเปลี่ยนสีตอน hover */
+    font-size: 36px; /* กำหนดขนาดปกติเมื่อแตะ */
+}
+
+/* เพิ่มเมื่อแตะ (focus) */
+.sidebar .closebtn:focus {
+    outline: none; /* ลบเส้นขอบ */
+    font-size: 36px; /* กำหนดขนาดปกติเมื่อแตะ */
 }
 
 /* ปุ่มแฮมเบอร์เกอร์ */
@@ -165,7 +150,6 @@ header p {
 .sidebar-open .hamburger {
     display: none;
 }
-
 
 /* Responsive Design */
 @media (max-width: 768px) {

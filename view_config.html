@@ -1,91 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Drone Config</title>
-    <link rel="stylesheet" href="view_config.css">
+    <link rel="stylesheet" href="view_config.css" />
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/feather-icons"></script> 
-</head>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons"></script>
+  </head>
 
-<body>
-
+  <body>
     <span class="hamburger" onclick="toggleSidebar()">&#9776;</span>
 
     <!-- Sidebar -->
     <div id="mySidebar" class="sidebar">
-        <a href="javascript:void(0)" class="closebtn" onclick="toggleSidebar()">&#120143;</a>
-        <a href="view_logs.html">
-            <i data-feather="eye" style="font-size: 20px; margin-right: 10px;"></i>
-            View Logs
-        </a>
-        <a href="temperature_log_form.html">
-            <i data-feather="thermometer" style="font-size: 20px; margin-right: 10px;"></i>
-            Temperature
-        </a>
+      <a href="javascript:void(0)" class="closebtn" onclick="toggleSidebar()">&#120143;</a>
+      <a href="view_config.html">
+        <i data-feather="settings" style="font-size: 20px; margin-right: 10px"></i>
+        View Config
+      </a>
+      <a href="view_logs.html">
+        <i data-feather="eye" style="font-size: 20px; margin-right: 10px"></i>
+        View Logs
+      </a>
+      <a href="temperature_log_form.html">
+        <i data-feather="thermometer" style="font-size: 20px; margin-right: 10px"></i>
+        Temperature
+      </a>
     </div>
 
     <div class="container">
-        <header>
-            <h1>Drone Config</h1>
-        </header>
-        <section class="config-details">
-            <p><strong>Drone ID:</strong> <span id="droneId">Loading...</span></p>
-            <p><strong>Drone Name:</strong> <span id="droneName">Loading...</span></p>
-            <p><strong>Light:</strong> <span id="light">Loading...</span></p>
-            <p><strong>Country:</strong> <span id="country">Loading...</span></p>
-        </section>
+      <header>
+        <h1>Drone Config</h1>
+      </header>
+      <section class="config-details">
+        <p><strong>Drone ID:</strong> <span id="droneId">Loading...</span></p>
+        <p>
+          <strong>Drone Name:</strong> <span id="droneName">Loading...</span>
+        </p>
+        <p><strong>Light:</strong> <span id="light">Loading...</span></p>
+        <p><strong>Country:</strong> <span id="country">Loading...</span></p>
+      </section>
     </div>
 
-    <a href="temperature_log_form.html">
-        <button class="next-btn">Next</button>
-    </a>
 
     <script>
-        async function fetchConfigData() {
-            try {
-                const idResponse = await axios.get('http://localhost:3000/get-drone-id');
-                const droneId = idResponse.data.droneId;
+      async function fetchConfigData() {
+        try {
+          const idResponse = await axios.get(
+            "http://localhost:3000/get-drone-id"
+          );
+          const droneId = idResponse.data.droneId;
 
-                console.log('Fetched droneId:', droneId);
+          console.log("Fetched droneId:", droneId);
 
-                const response = await axios.get(`http://localhost:3000/configs/${droneId}`);
-                document.getElementById('droneId').textContent = response.data.drone_id || 'No data';
-                document.getElementById('droneName').textContent = response.data.drone_name || 'No data';
-                document.getElementById('light').textContent = response.data.light || 'No data';
-                document.getElementById('country').textContent = response.data.country || 'No data';
-            } catch (error) {
-                console.error('Error fetching data:', error);
-                document.getElementById('droneId').textContent = 'Error';
-                document.getElementById('droneName').textContent = 'Error';
-                document.getElementById('light').textContent = 'Error';
-                document.getElementById('country').textContent = 'Error';
-            }
+          const response = await axios.get(
+            `http://localhost:3000/configs/${droneId}`
+          );
+          document.getElementById("droneId").textContent =
+            response.data.drone_id || "No data";
+          document.getElementById("droneName").textContent =
+            response.data.drone_name || "No data";
+          document.getElementById("light").textContent =
+            response.data.light || "No data";
+          document.getElementById("country").textContent =
+            response.data.country || "No data";
+        } catch (error) {
+          console.error("Error fetching data:", error);
+          document.getElementById("droneId").textContent = "Error";
+          document.getElementById("droneName").textContent = "Error";
+          document.getElementById("light").textContent = "Error";
+          document.getElementById("country").textContent = "Error";
         }
+      }
 
-        fetchConfigData();
+      fetchConfigData();
 
-        document.addEventListener("DOMContentLoaded", function () {
-            feather.replace(); 
-        });
+      document.addEventListener("DOMContentLoaded", function () {
+        feather.replace();
+      });
 
-       
-        function toggleSidebar() {
-            let sidebar = document.getElementById("mySidebar");
-            let body = document.body;
+      function toggleSidebar() {
+        let sidebar = document.getElementById("mySidebar");
+        let body = document.body;
 
-            if (sidebar.style.display === "block") {
-                sidebar.style.display = "none";  
-                body.classList.remove('sidebar-open');
-            } else {
-                sidebar.style.display = "block";  
-                body.classList.add('sidebar-open');
-            }
+        if (sidebar.style.display === "block") {
+          sidebar.style.display = "none";
+          body.classList.remove("sidebar-open");
+        } else {
+          sidebar.style.display = "block";
+          body.classList.add("sidebar-open");
         }
+      }
     </script>
-
-</body>
-
+  </body>
 </html>
